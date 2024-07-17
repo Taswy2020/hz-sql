@@ -51,7 +51,7 @@ const app = new Vue({
         {{#if diagnose }}
           AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
             {{#if diagnoseId}} AND {{/if}}
-            {{regexp_like_logic}} t.in_diagnose_name||t.out_diagnose_name like {{{diagnoseItem}}}
+            nvl(t.in_diagnose_name,0)||nvl(t.out_diagnose_name,0) {{regexp_like_logic}}  like {{{diagnoseItem}}}
           {{/each}} )
         {{/if}}
         AND t.pay_per_retio <> 1)
@@ -83,7 +83,7 @@ const app = new Vue({
         {{#if diagnose }}
           AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
             {{#if diagnoseId}} AND {{/if}}
-            {{regexp_like_logic}} t.in_diagnose_name||t.out_diagnose_name like {{{diagnoseItem}}}
+           nvl(t.in_diagnose_name,0)||nvl(t.out_diagnose_name,0)  {{regexp_like_logic}}  like {{{diagnoseItem}}}
           {{/each}} )
         {{/if}}
           AND pay_per_retio <> 1) t
@@ -104,7 +104,7 @@ const app = new Vue({
         {{#if diagnose }}
           AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
             {{#if diagnoseId}} AND {{/if}}
-            {{regexp_like_logic}} t.in_diagnose_name||t.out_diagnose_name like {{{diagnoseItem}}}
+             nvl(t.in_diagnose_name,0)||nvl(t.out_diagnose_name,0) {{regexp_like_logic}} like {{{diagnoseItem}}}
           {{/each}} )
         {{/if}}
         AND t.pay_per_retio <> 1
@@ -122,7 +122,7 @@ const app = new Vue({
       {{#if diagnose }}
           AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
             {{#if diagnoseId}} AND {{/if}}
-            {{regexp_like_logic}} t.in_diagnose_name||t.out_diagnose_name like {{{diagnoseItem}}}
+           nvl(t.in_diagnose_name,0)||nvl(t.out_diagnose_name,0)  {{regexp_like_logic}}  like {{{diagnoseItem}}}
           {{/each}} )
         {{/if}}
         AND t.pay_per_retio <> 1
@@ -284,7 +284,7 @@ const app = new Vue({
             {{#if diagnose }}
           AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
             {{#if diagnoseId}} AND {{/if}}
-            {{regexp_like_logic}} t.in_diagnose_name||t.out_diagnose_name like {{{diagnoseItem}}}
+           nvl(t.in_diagnose_name,0)||nvl(t.out_diagnose_name,0)  {{regexp_like_logic}}  like {{{diagnoseItem}}}
           {{/each}} )
         {{/if}}
             AND t.pay_per_retio <> 1)
@@ -319,7 +319,7 @@ const app = new Vue({
             {{#if diagnose }}
           AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
             {{#if diagnoseId}} AND {{/if}}
-            {{regexp_like_logic}} t.in_diagnose_name||t.out_diagnose_name like {{{diagnoseItem}}}
+            nvl(t.in_diagnose_name,0)||nvl(t.out_diagnose_name,0) {{regexp_like_logic}}  like {{{diagnoseItem}}}
           {{/each}} )
         {{/if}}
               AND pay_per_retio <> 1) t
@@ -343,7 +343,7 @@ const app = new Vue({
             {{#if diagnose }}
           AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
             {{#if diagnoseId}} AND {{/if}}
-            {{regexp_like_logic}} t.in_diagnose_name||t.out_diagnose_name like {{{diagnoseItem}}}
+             nvl(t.in_diagnose_name,0)||nvl(t.out_diagnose_name,0) {{regexp_like_logic}} like {{{diagnoseItem}}}
           {{/each}} )
         {{/if}}
             AND t.pay_per_retio <> 1
@@ -364,7 +364,7 @@ const app = new Vue({
           {{#if diagnose }}
           AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
             {{#if diagnoseId}} AND {{/if}}
-            {{regexp_like_logic}} t.in_diagnose_name||t.out_diagnose_name like {{{diagnoseItem}}}
+             nvl(t.in_diagnose_name,0)||nvl(t.out_diagnose_name,0) {{regexp_like_logic}} like {{{diagnoseItem}}}
           {{/each}} )
         {{/if}}
             AND t.pay_per_retio <> 1
