@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewpoint" content="width=device-width, initial-scale=1.0">
+  <title>红阵SQL模板代码生成器</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <script src="dist/sql-formatter.min.js"></script>
+  <script src="dist/vue.js"></script>
+  <script src="dist/handlebars.js"></script>
+  <script src="dist/clipboard.min.js"></script>
+</head>
+
+<body>
+
+  <div id="app">
+    <!-- 导航栏 -->
+    <nav id="navbar">
+      <ul>
+        <li v-for="item in navItems" :key="item.id">
+          <a 
+            href="#" 
+            @click.prevent="setTemplateName(item.value)" 
+            :class="{ active: item.value === templateName }"
+            class="nav-link"
+          >
+            {{ item.text }}
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <!-- 内容区域 -->
+    <div id="content">
+      <div v-if="templateName === 'repeated'">
+        <h2>重复收费模板</h2>
+        <label for="tableName">表名:</label>
+        <input type="text" id="tableName" @keyup="onKeyUp" v-model.trim="tableName">
+
+        <label for="period">结算周期:</label>
+        <select id="period" v-model="repeated.period" @keyup="onKeyUp">
+          <option value="TRUNC(t.cost_time) = TRUNC(a.cost_time)">按天</option>
+          <option value="abs(ceil(t.cost_time - a.cost_time) * 24 * 60) < 60">按小时</option>
+          <option value="TRUNC(t.clear_time) = TRUNC(a.clear_time)">按住院周期</option>
+        </select>
+
+        <label for="code">重复收费编码:</label>
+        <input type="text" id="code" @keyup="onKeyUp" v-model="repeated.code" placeholder="编码1,编码2,编码3">
+
+        <label for="normalCodes">正常收费编码:</label>
+        <input type="text" id="normalCodes" @keyup="onKeyUp" v-model="repeated.normalCodes" placeholder="编码1,编码2,编码3">
+
+
+        <label for="diagnose-group">[*可选]适应症:</label>
+        <div class="form-group" id="diagnose-group">
+          <div class="fixed-width-wrapper">
+            <label for="regexp_like_logic">匹配逻辑:</label>
+            <select id="fixed-width-input regexp_like_logic" v-model="repeated.regexp_like_logic">
+              <option value="not">NOT REGEXP_LIKE(...)</option>
+              <option value="">REGEXP_LIKE(...)</option>
+            </select>
+          </div>
+          <div class="variable-width-wrapper">
+            <label for="variable-width-input">适应症名称:</label>
+            <input type="text" id="variable-width-input diagnose" @keyup="onKeyUp" v-model="repeated.diagnose"
+              placeholder="名称1,名称2,名称3 或 名称1|名称2|名称3">
+          </div>
+        </div>
+
+        <button @click="generateSQL" @keyup="onKeyUp">生成SQL</button>
+
+        <h2>生成的SQL代码:</h2>
+        <div class="code-container">
+          <button class="copy-btn" data-clipboard-target="#rep_result">复制代码</button>
+          <pre id="rep_result"><code class="language-sql">{{ repeated.formattedSQL }}</code></pre>
+        </div>
+      </div>
+
+
+
+      <div v-if="templateName === 'excessive'">
+        <!-- TODO: 动态数量比较、天数比较 -->
+        <h2>超标准收费(量)</h2>
+        <label for="tableName">表名:</label>
+        <input type="text" id="tableName" @keyup="onKeyUp" v-model.trim="tableName">
+
+        <label for="period">结算周期:</label>
+        <select id="period" v-model="excessive.period" @keyup="onKeyUp">
+          <option value="TRUNC(t.cost_time)">按天</option>
+          <option value="TRUNC(t.clear_time)">按住院周期</option>
+          <option value="to_char(cost_TIME,'YYYYMMDD HH24:MI')">按次(分钟)</option>
+          <option value="to_char(cost_TIME,'YYYYMMDD HH24)">按次(小时)</option>
+        </select>
+
+        
+        <label for="num">标准数量:</label>
+        <input type="text" id="num" @keyup="onKeyUp" v-model="excessive.num">
+
+
+        <label for="code">项目编码:</label>
+        <input type="text" id="code" @keyup="onKeyUp" v-model="excessive.code" placeholder="编码1,编码2,编码3">
+
+        <label for="diagnose-group">[*可选]适应症:</label>
+        <div class="form-group" id="diagnose-group">
+          <div class="fixed-width-wrapper">
+            <label for="regexp_like_logic">匹配逻辑:</label>
+            <select id="fixed-width-input regexp_like_logic" v-model="excessive.regexp_like_logic">
+              <option value="not">NOT REGEXP_LIKE(...)</option>
+              <option value="">REGEXP_LIKE(...)</option>
+            </select>
+          </div>
+          <div class="variable-width-wrapper">
+            <label for="variable-width-input">适应症名称:</label>
+            <input type="text" id="variable-width-input diagnose" @keyup="onKeyUp" v-model="excessive.diagnose"
+              placeholder="名称1,名称2,名称3 或 名称1|名称2|名称3">
+          </div>
+        </div>
+
+        <button @click="generateSQL" @keyup="onKeyUp">生成SQL</button>
+
+        <h2>生成的SQL代码:</h2>
+        <div class="code-container">
+          <button class="copy-btn" data-clipboard-target="#excessive_result">复制代码</button>
+          <pre id="excessive_result"><code class="language-sql">{{ excessive.formattedSQL }}</code></pre>
+        </div>
+      </div>
+
+
+
+      <div v-if="templateName === 'rise'">
+        <h2>超标准收费(价)</h2>
+        <label for="tableName">表名:</label>
+        <input type="text" id="tableName" @keyup="onKeyUp" v-model.trim="tableName">
+
+        
+        
+        <label for="price">标准价格:</label>
+        <input type="text" id="price" @keyup="onKeyUp" v-model="rise.price">
+
+
+        <label for="code">项目编码:</label>
+        <input type="text" id="code" @keyup="onKeyUp" v-model="rise.code" placeholder="编码1,编码2,编码3">
+
+        <label for="diagnose-group">[*可选]适应症:</label>
+        <div class="form-group" id="diagnose-group">
+          <div class="fixed-width-wrapper">
+            <label for="regexp_like_logic">匹配逻辑:</label>
+            <select id="fixed-width-input regexp_like_logic" v-model="rise.regexp_like_logic">
+              <option value="not">NOT REGEXP_LIKE(...)</option>
+              <option value="">REGEXP_LIKE(...)</option>
+            </select>
+          </div>
+          <div class="variable-width-wrapper">
+            <label for="variable-width-input">适应症名称:</label>
+            <input type="text" id="variable-width-input diagnose" @keyup="onKeyUp" v-model="rise.diagnose"
+              placeholder="名称1,名称2,名称3 或 名称1|名称2|名称3">
+          </div>
+        </div>
+
+        <button @click="generateSQL" @keyup="onKeyUp">生成SQL</button>
+
+        <h2>生成的SQL代码:</h2>
+        <div class="code-container">
+          <button class="copy-btn" data-clipboard-target="#rise_result">复制代码</button>
+          <pre id="rise_result"><code class="language-sql">{{ rise.formattedSQL }}</code></pre>
+        </div>
+      </div>
+
+
+      
+      <div v-if="templateName === 'swapping'">
+        <h2>串换项目/不纳入医保范围</h2>
+        <label for="tableName">表名:</label>
+        <input type="text" id="tableName" @keyup="onKeyUp" v-model.trim="tableName">
+
+
+        <label for="code">项目编码:</label>
+        <input type="text" id="code" @keyup="onKeyUp" v-model="swapping.code" placeholder="编码1,编码2,编码3">
+
+        <label for="diagnose-group">[*可选]适应症:</label>
+        <div class="form-group" id="diagnose-group">
+          <div class="fixed-width-wrapper">
+            <label for="regexp_like_logic">匹配逻辑:</label>
+            <select id="fixed-width-input regexp_like_logic" v-model="swapping.regexp_like_logic">
+              <option value="not">NOT REGEXP_LIKE(...)</option>
+              <option value="">REGEXP_LIKE(...)</option>
+            </select>
+          </div>
+          <div class="variable-width-wrapper">
+            <label for="variable-width-input">适应症名称:</label>
+            <input type="text" id="variable-width-input diagnose" @keyup="onKeyUp" v-model="swapping.diagnose"
+              placeholder="名称1,名称2,名称3 或 名称1|名称2|名称3">
+          </div>
+        </div>
+
+        <button @click="generateSQL" @keyup="onKeyUp">生成SQL</button>
+
+        <h2>生成的SQL代码:</h2>
+        <div class="code-container">
+          <button class="copy-btn" data-clipboard-target="#swapping_result">复制代码</button>
+          <pre id="swapping_result"><code class="language-sql">{{ swapping.formattedSQL }}</code></pre>
+        </div>
+      </div>
+
+
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+
+</body>
+
+</html>

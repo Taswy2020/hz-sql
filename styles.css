@@ -1,0 +1,200 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  #navbar {
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+  }
+  
+  #navbar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: left;
+  }
+  
+  #navbar li {
+    margin-right: 20px;
+  }
+  
+  #navbar .nav-link {
+    color: white;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+  }
+  
+  #navbar .nav-link:hover,
+  #navbar .nav-link.active {
+    background-color: #555;
+  }
+  
+  #content {
+    margin: 20px;
+  }
+  
+  section {
+    display: none;
+    margin-bottom: 20px;
+  }
+  
+  section.active {
+    display: block;
+  }
+  
+  
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+  }
+
+  .template {
+    display: none;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  select, input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  input[type="text"] {
+    margin-bottom: 10px;
+  }
+
+  button {
+    width: 100%;
+    padding: 10px;
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  button:hover {
+    background-color: #4cae4c;
+  }
+
+  pre {
+    white-space: pre-wrap;
+    background-color: #eee;
+    border: 1px solid #ddd;
+    border-left: 5px solid #ccc;
+    padding: 20px;
+    margin-top: 20px;
+    font-size: 14px;
+    font-family: 'Courier New', monospace;
+  }
+
+
+  .code-list ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .code-list li {
+    margin: 5px 0;
+  }
+  
+  .code-list button {
+    margin-left: 10px;
+    cursor: pointer;
+  }
+
+  .code-container {
+    position: relative;
+    margin: 20px 0;
+  }
+  
+
+  pre code {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    display: block;
+  }
+
+  .copy-btn {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #d9d9d9;
+    color: #d5d5d5;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .copy-btn:hover {
+    background-color: #888888;
+  }
+
+  .form-group {
+    display: flex;
+    align-items: center;
+  }
+  
+  .fixed-width-wrapper,
+  .variable-width-wrapper {
+    display: flex;
+    align-items: center;
+  }
+  
+  .fixed-width-wrapper {
+    margin-right: 20px; /* 设置固定宽度 wrapper 的右边距 */
+    white-space: nowrap; /* 防止内部元素换行 */
+  }
+  
+  .fixed-width-wrapper label {
+    width: 80px; /* 固定标签的宽度 */
+    text-align: right;
+    margin-right: 5px; /* 标签和输入框之间的间隔 */
+  }
+  
+  #fixed-width-input {
+    width: 100px; /* 固定输入框的宽度 */
+  }
+  
+  .variable-width-wrapper {
+    flex-grow: 1; /* 可变宽度 wrapper 填充剩余空间 */
+  }
+  
+  .variable-width-wrapper label {
+    margin-right: 5px; /* 标签和输入框之间的间隔 */
+    width: 110px;
+  }
+  
+  .variable-width-input {
+    flex-grow: 1; /* 可变宽度的 input 占据其父容器的剩余空间 */
+    width: 100%; /* 确保 input 宽度自适应 */
+  }
