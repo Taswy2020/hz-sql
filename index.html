@@ -75,7 +75,10 @@
 
         <h2>生成的SQL代码:</h2>
         <div class="code-container">
-          <button class="copy-btn" data-clipboard-target="#rep_result">复制代码</button>
+          <div class="button-container">
+            <button class="copy-btn" data-clipboard-target="#rep_result">复制代码</button>
+            <button class="clear-btn" @click="clear">清空</button>
+          </div>
           <pre id="rep_result"><code class="language-sql">{{ repeated.formattedSQL }}</code></pre>
         </div>
       </div>
@@ -124,7 +127,10 @@
 
         <h2>生成的SQL代码:</h2>
         <div class="code-container">
-          <button class="copy-btn" data-clipboard-target="#excessive_result">复制代码</button>
+          <div class="button-container">
+            <button class="copy-btn" data-clipboard-target="#excessive_result">复制代码</button>
+            <button class="clear-btn" @click="clear">清空</button>
+          </div>
           <pre id="excessive_result"><code class="language-sql">{{ excessive.formattedSQL }}</code></pre>
         </div>
       </div>
@@ -165,7 +171,10 @@
 
         <h2>生成的SQL代码:</h2>
         <div class="code-container">
-          <button class="copy-btn" data-clipboard-target="#rise_result">复制代码</button>
+          <div class="button-container">
+            <button class="copy-btn" data-clipboard-target="#rise_result">复制代码</button>
+            <button class="clear-btn" @click="clear">清空</button>
+          </div>
           <pre id="rise_result"><code class="language-sql">{{ rise.formattedSQL }}</code></pre>
         </div>
       </div>
@@ -201,7 +210,10 @@
 
         <h2>生成的SQL代码:</h2>
         <div class="code-container">
-          <button class="copy-btn" data-clipboard-target="#swapping_result">复制代码</button>
+          <div class="button-container">
+            <button class="copy-btn" data-clipboard-target="#swapping_result">复制代码</button>
+            <button class="clear-btn" @click="clear">清空</button>
+          </div>
           <pre id="swapping_result"><code class="language-sql">{{ swapping.formattedSQL }}</code></pre>
         </div>
       </div>

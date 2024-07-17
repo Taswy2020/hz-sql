@@ -74,7 +74,7 @@ const app = new Vue({
               ROW_NUMBER() OVER (PARTITION BY medical_code, bill_id,item_code,
                 {{{ period}}} ORDER BY medical_code, bill_id, {{{ period}}} )  row_num,
               SUM(num)
-                  OVER (PARTITION BY medical_code, bill_id,item_code, 
+                  OVER (PARTITION BY medical_code, bill_id, item_code, 
                     {{{ period}}} ) total_count
         FROM {{table_name}} t
         WHERE item_code in ({{{codes}}})
@@ -226,6 +226,119 @@ const app = new Vue({
       }
     },
 
+    clear() {
+      if (this.templateName === 'repeated') {
+        this.repeated = {
+          period: 'TRUNC(t.cost_time) = TRUNC(a.cost_time)',
+          code: '',
+          normalCodes: '',
+          diagnose: '',
+          regexp_like_logic: 'not',
+          formattedSQL:'',
+          source: `
+            SELECT t.*,
+            (CASE WHEN t.item_code in ({{{rep_code}}}) THEN t.money END) AS money_rules
+            FROM {{table_name}} t
+            WHERE EXISTS
+              (SELECT 1
+              FROM {{table_name}} a
+              WHERE a.pay_per_retio < 1
+                AND a.item_code in ({{{rep_code}}})
+                AND t.bill_id = a.bill_id
+                AND {{{ join_time }}}
+                AND t.medical_code = a.medical_code)
+            AND EXISTS
+              (SELECT 1
+              FROM {{table_name}} a
+              WHERE a.item_code in
+                  ({{{gen_codes}}})
+                AND t.bill_id = a.bill_id
+                AND {{{ join_time }}}
+                AND t.medical_code = a.medical_code)
+            AND ((t.item_code in ({{{rep_code}}})
+            {{#if diagnose}}
+            and {{regexp_like_logic}} regexp_like(t.in_diagnose_name||t.out_diagnose_name,
+              '{{{diagnose}}}')
+            {{/if}}
+            AND t.pay_per_retio < 1)
+              OR t.item_code in
+              ({{{gen_codes}}}))
+          `
+        }
+        
+      } 
+      else if (this.templateName === 'excessive') {
+        this.excessive= {
+          period: 'TRUNC(t.cost_time)',
+          code: '',
+          num: 1,
+          diagnose: '',
+          regexp_like_logic: 'not',
+          formattedSQL: '',
+          source: `
+        SELECT t.*,
+           CASE
+               WHEN total_count > {{num}} AND row_num = 1
+                   THEN (total_count - {{num}}) * t.unit_price
+               ELSE NULL END money_rules
+      FROM (SELECT t.*,
+                  ROW_NUMBER() OVER (PARTITION BY medical_code, bill_id,item_code,
+                    {{{ period}}} ORDER BY medical_code, bill_id, {{{ period}}} )  row_num,
+                  SUM(num)
+                      OVER (PARTITION BY medical_code, bill_id, item_code, 
+                        {{{ period}}} ) total_count
+            FROM {{table_name}} t
+            WHERE item_code in ({{{codes}}})
+            {{#if diagnose}}
+            and {{regexp_like_logic}} regexp_like(t.in_diagnose_name||t.out_diagnose_name,
+              '{{{diagnose}}}')
+            {{/if}}
+              AND pay_per_retio <> 1) t
+      WHERE total_count > {{num}} 
+        `,
+        }
+        
+      }
+      else if (this.templateName === 'rise') {
+        this.rise= {
+          code: '',
+          price: null,
+          diagnose: '',
+          regexp_like_logic: 'not',
+          formattedSQL: '',
+          source: `
+          SELECT t.*, (t.unit_price - {{price}}) * t.num money_rules
+          FROM {{table_name}} t
+          WHERE t.item_code in  ({{{codes}}})
+            AND t.unit_price > {{price}}
+            {{#if diagnose}}
+            AND {{regexp_like_logic}} regexp_like(t.in_diagnose_name||t.out_diagnose_name,
+              '{{{diagnose}}}')
+            {{/if}}
+            AND t.pay_per_retio < 1
+        `,
+            }
+      }
+      else if (this.templateName === 'swapping') {
+        
+        this.swapping = {
+          code: '',
+          diagnose: '',
+          regexp_like_logic: 'not',
+          formattedSQL: '',
+          source: `
+          SELECT t.*, t.money money_rules
+          FROM {{table_name}} t
+          WHERE t.item_code in  ({{{codes}}})
+          {{#if diagnose}}
+          AND {{regexp_like_logic}} regexp_like(t.in_diagnose_name||t.out_diagnose_name,
+            '{{{diagnose}}}')
+          {{/if}}
+            AND t.pay_per_retio < 1
+        `,}
+      }
+    },
+
     onKeyUp(event) {
       if (event.key === 'Enter') {
         this.generateSQL();
@@ -234,6 +347,6 @@ const app = new Vue({
 
   },
   mounted() {
-
+    
   }
 });

@@ -47,7 +47,7 @@ body {
     display: block;
   }
   
-  
+
   body {
     font-family: 'Arial', sans-serif;
     background-color: #f4f4f4;
@@ -146,17 +146,26 @@ body {
     display: block;
   }
 
-  .copy-btn {
-    margin-top: 10px;
+  .copy-btn, .clear-btn {
+    margin: 10px;
     padding: 5px 10px;
-    background-color: #d9d9d9;
+    background-color: #888888;
     color: #d5d5d5;
     border: none;
     border-radius: 5px;
     cursor: pointer;
   }
-  .copy-btn:hover {
-    background-color: #888888;
+  .copy-btn:hover,
+  .copy-btn:active,
+  .clear-btn:hover,
+  .clear-btn:active {
+    background-color: #4cae4c;
+  }
+
+  .button-container {
+    display: flex; /* 使用Flexbox布局 */
+    justify-content: center; /* 横向居中对齐 */
+    align-items: center; /* 纵向居中对齐 */
   }
 
   .form-group {
