@@ -21,7 +21,7 @@ const app = new Vue({
     tableName: 'yb_fymxxx',
     templateName: 'repeated',
     repeated: {
-      period: 'TRUNC(t.cost_time) = TRUNC(a.cost_time)',
+      period: 'TRUNC(t.cost_time) = TRUNC(a.cost_time) & TRUNC(t.cost_time) = TRUNC(b.cost_time)',
       code: '',
       normalCodes: '',
       diagnose: '',
@@ -37,16 +37,16 @@ const app = new Vue({
           WHERE a.pay_per_retio <> 1
             AND a.item_code in ({{{rep_code}}})
             AND t.bill_id = a.bill_id
-            AND {{{ join_time }}}
+            AND {{{ join_time_a }}}
             AND t.medical_code = a.medical_code)
         AND EXISTS
           (SELECT 1
-          FROM {{table_name}} a
-          WHERE a.item_code in
+          FROM {{table_name}} b
+          WHERE b.item_code in
               ({{{gen_codes}}})
-            AND t.bill_id = a.bill_id
-            AND {{{ join_time }}}
-            AND t.medical_code = a.medical_code)
+            AND t.bill_id = b.bill_id
+            AND {{{ join_time_b }}}
+            AND t.medical_code = b.medical_code)
         AND ((t.item_code in ({{{rep_code}}})
         {{#if diagnose }}
           AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
@@ -197,10 +197,12 @@ const app = new Vue({
 
     generateSQL() {
       if (this.templateName === 'repeated') {
+        const join_time = this.repeated.period.split('&');
         const context = {
           rep_code: this.formatStringArray(this.repeated.code), 
           table_name: this.tableName, 
-          join_time: this.repeated.period,
+          join_time_a: join_time[0],
+          join_time_b: join_time[1],
           gen_codes: this.formatStringArray(this.repeated.normalCodes),
           regexp_like_logic: this.repeated.regexp_like_logic,
           diagnose: this.str2LikeArray(this.repeated.diagnose)
@@ -261,36 +263,36 @@ const app = new Vue({
           regexp_like_logic: 'not',
           formattedSQL:'',
           source: `
-            SELECT t.*,
-            (CASE WHEN t.item_code in ({{{rep_code}}}) THEN t.money END) AS money_rules
-            FROM {{table_name}} t
-            WHERE EXISTS
-              (SELECT 1
-              FROM {{table_name}} a
-              WHERE a.pay_per_retio <> 1
-                AND a.item_code in ({{{rep_code}}})
-                AND t.bill_id = a.bill_id
-                AND {{{ join_time }}}
-                AND t.medical_code = a.medical_code)
-            AND EXISTS
-              (SELECT 1
-              FROM {{table_name}} a
-              WHERE a.item_code in
-                  ({{{gen_codes}}})
-                AND t.bill_id = a.bill_id
-                AND {{{ join_time }}}
-                AND t.medical_code = a.medical_code)
-            AND ((t.item_code in ({{{rep_code}}})
-            {{#if diagnose }}
+        SELECT t.*,
+        (CASE WHEN t.item_code in ({{{rep_code}}}) THEN t.money END) AS money_rules
+        FROM {{table_name}} t
+        WHERE EXISTS
+          (SELECT 1
+          FROM {{table_name}} a
+          WHERE a.pay_per_retio <> 1
+            AND a.item_code in ({{{rep_code}}})
+            AND t.bill_id = a.bill_id
+            AND {{{ join_time_a }}}
+            AND t.medical_code = a.medical_code)
+        AND EXISTS
+          (SELECT 1
+          FROM {{table_name}} b
+          WHERE b.item_code in
+              ({{{gen_codes}}})
+            AND t.bill_id = b.bill_id
+            AND {{{ join_time_b }}}
+            AND t.medical_code = b.medical_code)
+        AND ((t.item_code in ({{{rep_code}}})
+        {{#if diagnose }}
           AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
             {{#if diagnoseId}} AND {{/if}}
-           nvl(t.in_diagnose_name,0)||nvl(t.out_diagnose_name,0)  {{regexp_like_logic}}  like {{{diagnoseItem}}}
+            nvl(t.in_diagnose_name,0)||nvl(t.out_diagnose_name,0) {{regexp_like_logic}}  like {{{diagnoseItem}}}
           {{/each}} )
         {{/if}}
-            AND t.pay_per_retio <> 1)
-              OR t.item_code in
-              ({{{gen_codes}}}))
-          `
+        AND t.pay_per_retio <> 1)
+          OR t.item_code in
+          ({{{gen_codes}}}))
+      `
         }
         
       } 

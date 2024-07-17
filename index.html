@@ -43,9 +43,9 @@
 
         <label for="period">结算周期:</label>
         <select id="period" v-model="repeated.period" @keyup="onKeyUp">
-          <option value="TRUNC(t.cost_time) = TRUNC(a.cost_time)">按天</option>
-          <option value="ceil(abs(t.cost_time - a.cost_time) * 24 * 60) < 60">按小时</option>
-          <option value="TRUNC(t.clear_time) = TRUNC(a.clear_time)">按住院周期</option>
+          <option value="TRUNC(t.cost_time) = TRUNC(a.cost_time) & TRUNC(t.cost_time) = TRUNC(b.cost_time)" >按天</option>
+          <option value="ceil(abs(t.cost_time - a.cost_time) * 24 * 60) < 60 & ceil(abs(t.cost_time - b.cost_time) * 24 * 60) < 60">按小时</option>
+          <option value="TRUNC(t.clear_time) = TRUNC(a.clear_time) & TRUNC(t.clear_time) = TRUNC(b.clear_time)">按住院周期</option>
         </select>
 
         <label for="code">重复收费编码:</label>
