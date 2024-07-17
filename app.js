@@ -158,7 +158,7 @@ const app = new Vue({
       // 中文逗号替换为半角
       var array = input.replace(/，/g, ',');
       // 将字符串通过逗号分割成数组
-      var array = array.split(/,(?=\w)|(?:\|)(?=\w)/);
+      var array = array.split(/[,|]/);
       // 移除空格并过滤掉空字符串
       var formattedArray = array.map(function (item) {
         return item.trim();
