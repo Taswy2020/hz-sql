@@ -44,7 +44,7 @@
         <label for="period">结算周期:</label>
         <select id="period" v-model="repeated.period" @keyup="onKeyUp">
           <option value="TRUNC(t.cost_time) = TRUNC(a.cost_time)">按天</option>
-          <option value="abs(ceil(t.cost_time - a.cost_time) * 24 * 60) < 60">按小时</option>
+          <option value="ceil(abs(t.cost_time - a.cost_time) * 24 * 60) < 60">按小时</option>
           <option value="TRUNC(t.clear_time) = TRUNC(a.clear_time)">按住院周期</option>
         </select>
 
@@ -60,14 +60,14 @@
           <div class="fixed-width-wrapper">
             <label for="regexp_like_logic">匹配逻辑:</label>
             <select id="fixed-width-input regexp_like_logic" v-model="repeated.regexp_like_logic">
-              <option value="not">NOT REGEXP_LIKE(...)</option>
-              <option value="">REGEXP_LIKE(...)</option>
+              <option value="not">NOT LIKE</option>
+              <option value="">LIKE</option>
             </select>
           </div>
           <div class="variable-width-wrapper">
             <label for="variable-width-input">适应症名称:</label>
             <input type="text" id="variable-width-input diagnose" @keyup="onKeyUp" v-model="repeated.diagnose"
-              placeholder="名称1,名称2,名称3 或 名称1|名称2|名称3">
+              placeholder="名称1,名称2,名称3 不需添加%">
           </div>
         </div>
 
@@ -77,7 +77,7 @@
         <div class="code-container">
           <div class="button-container">
             <button class="copy-btn" data-clipboard-target="#rep_result">复制代码</button>
-            <button class="clear-btn" @click="clear">清空</button>
+            <button class="clear-btn" @click="clear">重置</button>
           </div>
           <pre id="rep_result"><code class="language-sql">{{ repeated.formattedSQL }}</code></pre>
         </div>
@@ -112,14 +112,14 @@
           <div class="fixed-width-wrapper">
             <label for="regexp_like_logic">匹配逻辑:</label>
             <select id="fixed-width-input regexp_like_logic" v-model="excessive.regexp_like_logic">
-              <option value="not">NOT REGEXP_LIKE(...)</option>
-              <option value="">REGEXP_LIKE(...)</option>
+              <option value="not">NOT LIKE</option>
+              <option value="">LIKE</option>
             </select>
           </div>
           <div class="variable-width-wrapper">
             <label for="variable-width-input">适应症名称:</label>
             <input type="text" id="variable-width-input diagnose" @keyup="onKeyUp" v-model="excessive.diagnose"
-              placeholder="名称1,名称2,名称3 或 名称1|名称2|名称3">
+              placeholder="名称1,名称2,名称3 不需添加%">
           </div>
         </div>
 
@@ -129,7 +129,7 @@
         <div class="code-container">
           <div class="button-container">
             <button class="copy-btn" data-clipboard-target="#excessive_result">复制代码</button>
-            <button class="clear-btn" @click="clear">清空</button>
+            <button class="clear-btn" @click="clear">重置</button>
           </div>
           <pre id="excessive_result"><code class="language-sql">{{ excessive.formattedSQL }}</code></pre>
         </div>
@@ -156,14 +156,14 @@
           <div class="fixed-width-wrapper">
             <label for="regexp_like_logic">匹配逻辑:</label>
             <select id="fixed-width-input regexp_like_logic" v-model="rise.regexp_like_logic">
-              <option value="not">NOT REGEXP_LIKE(...)</option>
-              <option value="">REGEXP_LIKE(...)</option>
+              <option value="not">NOT LIKE</option>
+              <option value="">LIKE</option>
             </select>
           </div>
           <div class="variable-width-wrapper">
             <label for="variable-width-input">适应症名称:</label>
             <input type="text" id="variable-width-input diagnose" @keyup="onKeyUp" v-model="rise.diagnose"
-              placeholder="名称1,名称2,名称3 或 名称1|名称2|名称3">
+              placeholder="名称1,名称2,名称3 不需添加%">
           </div>
         </div>
 
@@ -173,7 +173,7 @@
         <div class="code-container">
           <div class="button-container">
             <button class="copy-btn" data-clipboard-target="#rise_result">复制代码</button>
-            <button class="clear-btn" @click="clear">清空</button>
+            <button class="clear-btn" @click="clear">重置</button>
           </div>
           <pre id="rise_result"><code class="language-sql">{{ rise.formattedSQL }}</code></pre>
         </div>
@@ -195,14 +195,14 @@
           <div class="fixed-width-wrapper">
             <label for="regexp_like_logic">匹配逻辑:</label>
             <select id="fixed-width-input regexp_like_logic" v-model="swapping.regexp_like_logic">
-              <option value="not">NOT REGEXP_LIKE(...)</option>
-              <option value="">REGEXP_LIKE(...)</option>
+              <option value="not">NOT LIKE</option>
+              <option value="">LIKE</option>
             </select>
           </div>
           <div class="variable-width-wrapper">
             <label for="variable-width-input">适应症名称:</label>
             <input type="text" id="variable-width-input diagnose" @keyup="onKeyUp" v-model="swapping.diagnose"
-              placeholder="名称1,名称2,名称3 或 名称1|名称2|名称3">
+              placeholder="名称1,名称2,名称3 不需添加%">
           </div>
         </div>
 
@@ -212,7 +212,7 @@
         <div class="code-container">
           <div class="button-container">
             <button class="copy-btn" data-clipboard-target="#swapping_result">复制代码</button>
-            <button class="clear-btn" @click="clear">清空</button>
+            <button class="clear-btn" @click="clear">重置</button>
           </div>
           <pre id="swapping_result"><code class="language-sql">{{ swapping.formattedSQL }}</code></pre>
         </div>

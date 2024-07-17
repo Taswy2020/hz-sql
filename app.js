@@ -34,7 +34,7 @@ const app = new Vue({
         WHERE EXISTS
           (SELECT 1
           FROM {{table_name}} a
-          WHERE a.pay_per_retio < 1
+          WHERE a.pay_per_retio <> 1
             AND a.item_code in ({{{rep_code}}})
             AND t.bill_id = a.bill_id
             AND {{{ join_time }}}
@@ -48,11 +48,13 @@ const app = new Vue({
             AND {{{ join_time }}}
             AND t.medical_code = a.medical_code)
         AND ((t.item_code in ({{{rep_code}}})
-        {{#if diagnose}}
-        and {{regexp_like_logic}} regexp_like(t.in_diagnose_name||t.out_diagnose_name,
-          '{{{diagnose}}}')
+        {{#if diagnose }}
+          AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
+            {{#if diagnoseId}} AND {{/if}}
+            {{regexp_like_logic}} t.in_diagnose_name||t.out_diagnose_name like {{{diagnoseItem}}}
+          {{/each}} )
         {{/if}}
-        AND t.pay_per_retio < 1)
+        AND t.pay_per_retio <> 1)
           OR t.item_code in
           ({{{gen_codes}}}))
       `
@@ -78,9 +80,11 @@ const app = new Vue({
                     {{{ period}}} ) total_count
         FROM {{table_name}} t
         WHERE item_code in ({{{codes}}})
-        {{#if diagnose}}
-        and {{regexp_like_logic}} regexp_like(t.in_diagnose_name||t.out_diagnose_name,
-          '{{{diagnose}}}')
+        {{#if diagnose }}
+          AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
+            {{#if diagnoseId}} AND {{/if}}
+            {{regexp_like_logic}} t.in_diagnose_name||t.out_diagnose_name like {{{diagnoseItem}}}
+          {{/each}} )
         {{/if}}
           AND pay_per_retio <> 1) t
   WHERE total_count > {{num}} 
@@ -97,11 +101,13 @@ const app = new Vue({
       FROM {{table_name}} t
       WHERE t.item_code in  ({{{codes}}})
         AND t.unit_price > {{price}}
-        {{#if diagnose}}
-        AND {{regexp_like_logic}} regexp_like(t.in_diagnose_name||t.out_diagnose_name,
-          '{{{diagnose}}}')
+        {{#if diagnose }}
+          AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
+            {{#if diagnoseId}} AND {{/if}}
+            {{regexp_like_logic}} t.in_diagnose_name||t.out_diagnose_name like {{{diagnoseItem}}}
+          {{/each}} )
         {{/if}}
-        AND t.pay_per_retio < 1
+        AND t.pay_per_retio <> 1
     `,
         },
     swapping: {
@@ -113,11 +119,13 @@ const app = new Vue({
       SELECT t.*, t.money money_rules
       FROM {{table_name}} t
       WHERE t.item_code in  ({{{codes}}})
-      {{#if diagnose}}
-      AND {{regexp_like_logic}} regexp_like(t.in_diagnose_name||t.out_diagnose_name,
-        '{{{diagnose}}}')
-      {{/if}}
-        AND t.pay_per_retio < 1
+      {{#if diagnose }}
+          AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
+            {{#if diagnoseId}} AND {{/if}}
+            {{regexp_like_logic}} t.in_diagnose_name||t.out_diagnose_name like {{{diagnoseItem}}}
+          {{/each}} )
+        {{/if}}
+        AND t.pay_per_retio <> 1
     `,
     },
     navItems: [
@@ -130,6 +138,23 @@ const app = new Vue({
   methods: {
     setTemplateName(name) {
       this.templateName = name;
+    },
+
+    str2LikeArray(input) {
+      var array = input.replace(/，/g, ',');
+      // 将字符串通过逗号分割成数组
+      var array = array.split(',');
+      // 移除空格并过滤掉空字符串
+      var formattedArray = array.map(function (item) {
+        return item.trim();
+      }).filter(function (item) {
+        return item !== '';
+      });
+      // 为每个元素增加单引号
+      var quotedArray = formattedArray.map(function (item) {
+        return "'%" + item + "%'";
+      });
+      return quotedArray;
     },
 
     formatStringArray(input) {
@@ -178,7 +203,7 @@ const app = new Vue({
           join_time: this.repeated.period,
           gen_codes: this.formatStringArray(this.repeated.normalCodes),
           regexp_like_logic: this.repeated.regexp_like_logic,
-          diagnose: this.formatDiagnoseStringArray(this.repeated.diagnose)
+          diagnose: this.str2LikeArray(this.repeated.diagnose)
         }
         const template = Handlebars.compile(this.repeated.source);
         const result = template(context);
@@ -191,7 +216,7 @@ const app = new Vue({
           num: this.excessive.num,
           period: this.excessive.period,
           regexp_like_logic: this.excessive.regexp_like_logic,
-          diagnose: this.formatDiagnoseStringArray(this.excessive.diagnose)
+          diagnose: this.str2LikeArray(this.excessive.diagnose)
         }
         const template = Handlebars.compile(this.excessive.source);
         const result = template(context);
@@ -207,7 +232,7 @@ const app = new Vue({
           table_name: this.tableName, 
           price: this.rise.price,
           regexp_like_logic: this.rise.regexp_like_logic,
-          diagnose: this.formatDiagnoseStringArray(this.rise.diagnose)
+          diagnose: this.str2LikeArray(this.rise.diagnose)
         }
         const template = Handlebars.compile(this.rise.source);
         const result = template(context);
@@ -218,7 +243,7 @@ const app = new Vue({
           codes: this.formatStringArray(this.swapping.code),
           table_name: this.tableName, 
           regexp_like_logic: this.swapping.regexp_like_logic,
-          diagnose: this.formatDiagnoseStringArray(this.swapping.diagnose)
+          diagnose: this.str2LikeArray(this.swapping.diagnose)
         }
         const template = Handlebars.compile(this.swapping.source);
         const result = template(context);
@@ -242,7 +267,7 @@ const app = new Vue({
             WHERE EXISTS
               (SELECT 1
               FROM {{table_name}} a
-              WHERE a.pay_per_retio < 1
+              WHERE a.pay_per_retio <> 1
                 AND a.item_code in ({{{rep_code}}})
                 AND t.bill_id = a.bill_id
                 AND {{{ join_time }}}
@@ -256,11 +281,13 @@ const app = new Vue({
                 AND {{{ join_time }}}
                 AND t.medical_code = a.medical_code)
             AND ((t.item_code in ({{{rep_code}}})
-            {{#if diagnose}}
-            and {{regexp_like_logic}} regexp_like(t.in_diagnose_name||t.out_diagnose_name,
-              '{{{diagnose}}}')
-            {{/if}}
-            AND t.pay_per_retio < 1)
+            {{#if diagnose }}
+          AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
+            {{#if diagnoseId}} AND {{/if}}
+            {{regexp_like_logic}} t.in_diagnose_name||t.out_diagnose_name like {{{diagnoseItem}}}
+          {{/each}} )
+        {{/if}}
+            AND t.pay_per_retio <> 1)
               OR t.item_code in
               ({{{gen_codes}}}))
           `
@@ -289,10 +316,12 @@ const app = new Vue({
                         {{{ period}}} ) total_count
             FROM {{table_name}} t
             WHERE item_code in ({{{codes}}})
-            {{#if diagnose}}
-            and {{regexp_like_logic}} regexp_like(t.in_diagnose_name||t.out_diagnose_name,
-              '{{{diagnose}}}')
-            {{/if}}
+            {{#if diagnose }}
+          AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
+            {{#if diagnoseId}} AND {{/if}}
+            {{regexp_like_logic}} t.in_diagnose_name||t.out_diagnose_name like {{{diagnoseItem}}}
+          {{/each}} )
+        {{/if}}
               AND pay_per_retio <> 1) t
       WHERE total_count > {{num}} 
         `,
@@ -311,11 +340,13 @@ const app = new Vue({
           FROM {{table_name}} t
           WHERE t.item_code in  ({{{codes}}})
             AND t.unit_price > {{price}}
-            {{#if diagnose}}
-            AND {{regexp_like_logic}} regexp_like(t.in_diagnose_name||t.out_diagnose_name,
-              '{{{diagnose}}}')
-            {{/if}}
-            AND t.pay_per_retio < 1
+            {{#if diagnose }}
+          AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
+            {{#if diagnoseId}} AND {{/if}}
+            {{regexp_like_logic}} t.in_diagnose_name||t.out_diagnose_name like {{{diagnoseItem}}}
+          {{/each}} )
+        {{/if}}
+            AND t.pay_per_retio <> 1
         `,
             }
       }
@@ -330,11 +361,13 @@ const app = new Vue({
           SELECT t.*, t.money money_rules
           FROM {{table_name}} t
           WHERE t.item_code in  ({{{codes}}})
-          {{#if diagnose}}
-          AND {{regexp_like_logic}} regexp_like(t.in_diagnose_name||t.out_diagnose_name,
-            '{{{diagnose}}}')
-          {{/if}}
-            AND t.pay_per_retio < 1
+          {{#if diagnose }}
+          AND ({{#each diagnose as |diagnoseItem diagnoseId|}}
+            {{#if diagnoseId}} AND {{/if}}
+            {{regexp_like_logic}} t.in_diagnose_name||t.out_diagnose_name like {{{diagnoseItem}}}
+          {{/each}} )
+        {{/if}}
+            AND t.pay_per_retio <> 1
         `,}
       }
     },
