@@ -369,7 +369,7 @@ const app = new Vue({
         {{/if}}
             AND t.pay_per_retio <> 1
         `,}
-      }
+      } 
     },
 
     onKeyUp(event) {
